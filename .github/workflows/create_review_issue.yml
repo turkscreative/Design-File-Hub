@@ -1,0 +1,81 @@
+name: Create Review Issue
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - 'review/**'
+
+jobs:
+  create_issue:
+    runs-on: ubuntu-latest
+    permissions:
+      issues: write
+      contents: read
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+
+      - name: Get changed files
+        id: changed_files
+        uses: tj-actions/changed-files@v35
+        with:
+          files: review/**
+
+      - name: Create issue for each new or moved file
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          ADDED_FILES: ${{ steps.changed_files.outputs.added_files }}
+          RENAMED_FILES: ${{ steps.changed_files.outputs.renamed_files }}
+        run: |
+          all_new_files="$ADDED_FILES $RENAMED_FILES"
+
+          if [ -z "$all_new_files" ]; then
+            echo "No new or moved files to process in review/ directory."
+            exit 0
+          fi
+
+          for file in $all_new_files; do
+            echo "Processing file: $file"
+
+            # The file path is review/{ticketId}/{filename}
+            ticketId=$(echo "$file" | cut -d'/' -f2)
+            filename=$(basename "$file")
+
+            if [ -z "$ticketId" ] || [ -z "$filename" ] || [ "$ticketId" == "$filename" ]; then
+              echo "Could not parse ticketId or filename correctly from path: $file. Skipping."
+              continue
+            fi
+
+            echo "File: $filename"
+            echo "Ticket ID: $ticketId"
+
+            # Check if an issue already exists for this file to avoid duplicates
+            # Search for issues with the exact title and the label
+            existing_issue_url=$(gh issue list \
+              --label "ticket-id:$ticketId" \
+              --search "in:title \"Review Asset: $filename\"" \
+              --json url --jq '.[0].url' || true)
+
+            if [ ! -z "$existing_issue_url" ]; then
+                echo "An issue for $filename already exists: $existing_issue_url. Skipping."
+                continue
+            fi
+
+            gh issue create \
+              --title "Review Asset: $filename" \
+              --body "Please review the following design asset.
+
+**File:** [$filename](${{ github.server_url }}/${{ github.repository }}/blob/${{ github.sha }}/$file)
+**Direct Download:** [${{ github.server_url }}/${{ github.repository }}/raw/${{ github.sha }}/$file](${{ github.server_url }}/${{ github.repository }}/raw/${{ github.sha }}/$file)
+
+![Preview of $filename](${{ github.server_url }}/${{ github.repository }}/raw/${{ github.sha }}/$file)
+
+**Ticket ID:** $ticketId
+" \
+              --label "ticket-id:$ticketId"
+          done
