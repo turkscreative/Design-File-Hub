@@ -2,6 +2,14 @@
 
 This repository is designed to streamline the review and feedback process for design assets. It uses a two-stage workflow to manage internal reviews and client feedback separately.
 
+## Quick Setup
+
+1. **Clone the repository** (or ensure you have write access)
+2. **Run the setup script** (optional): `./setup.sh` to see the current structure
+3. **Start using the workflow** by placing design files in the appropriate folders
+
+📖 **For detailed setup instructions, see [SETUP.md](SETUP.md)**
+
 ## How it Works
 
 The workflow is built around two main folders: `staging` and `review`.
@@ -31,3 +39,18 @@ The workflow is built around two main folders: `staging` and `review`.
 | `review/` | Client Feedback | Move an asset here from `staging/`. | A new GitHub Issue is automatically created for client feedback. |
 
 This process ensures that we have a clear separation between our internal work and client-facing reviews, and it automates the creation of review links to speed up the feedback loop.
+
+## Testing the Workflow
+
+The repository includes sample files to test the workflow:
+
+1. **Sample files are in `staging/`**: 
+   - `staging/ticket-001/sample-design-v1.jpg`
+   - `staging/ticket-002/logo-concept.jpg`
+
+2. **To test the automated issue creation**:
+   - Move a file from `staging/ticket-001/` to `review/ticket-001/`
+   - Push the changes to GitHub
+   - Check the Issues tab for the automatically created review issue
+
+3. **Run `./setup.sh`** to see the current repository status and available files

@@ -66,16 +66,18 @@ jobs:
                 continue
             fi
 
+            # Create issue body content
+            issue_body="Please review the following design asset.
+
+          **File:** [$filename](${{ github.server_url }}/${{ github.repository }}/blob/${{ github.sha }}/$file)
+          **Direct Download:** [${{ github.server_url }}/${{ github.repository }}/raw/${{ github.sha }}/$file](${{ github.server_url }}/${{ github.repository }}/raw/${{ github.sha }}/$file)
+
+          ![Preview of $filename](${{ github.server_url }}/${{ github.repository }}/raw/${{ github.sha }}/$file)
+
+          **Ticket ID:** $ticketId"
+
             gh issue create \
               --title "Review Asset: $filename" \
-              --body "Please review the following design asset.
-
-**File:** [$filename](${{ github.server_url }}/${{ github.repository }}/blob/${{ github.sha }}/$file)
-**Direct Download:** [${{ github.server_url }}/${{ github.repository }}/raw/${{ github.sha }}/$file](${{ github.server_url }}/${{ github.repository }}/raw/${{ github.sha }}/$file)
-
-![Preview of $filename](${{ github.server_url }}/${{ github.repository }}/raw/${{ github.sha }}/$file)
-
-**Ticket ID:** $ticketId
-" \
+              --body "$issue_body" \
               --label "ticket-id:$ticketId"
           done
