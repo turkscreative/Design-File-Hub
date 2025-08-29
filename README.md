@@ -8,6 +8,8 @@ This repository is designed to streamline the review and feedback process for de
 2. **Run the setup script** (optional): `./setup.sh` to see the current structure
 3. **Start using the workflow** by placing design files in the appropriate folders
 
+📖 **For detailed setup instructions, see [SETUP.md](SETUP.md)**
+
 ## How it Works
 
 The workflow is built around two main folders: `staging` and `review`.
